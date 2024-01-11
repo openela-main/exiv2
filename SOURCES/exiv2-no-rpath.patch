@@ -1,0 +1,13 @@
+diff --git a/cmake/mainSetup.cmake b/cmake/mainSetup.cmake
+index fcaa21f..f69fc46 100644
+--- a/cmake/mainSetup.cmake
++++ b/cmake/mainSetup.cmake
+@@ -23,8 +23,6 @@ if (UNIX)
+     if (APPLE)
+         set(CMAKE_MACOSX_RPATH ON)
+         set(CMAKE_INSTALL_RPATH "@loader_path")
+-    else()
+-        join_paths(CMAKE_INSTALL_RPATH "$ORIGIN" ".." "${CMAKE_INSTALL_LIBDIR}")
+     endif()
+ endif()
+ 
