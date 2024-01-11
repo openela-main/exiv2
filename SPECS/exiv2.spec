@@ -1,24 +1,26 @@
 
 Summary: Exif and Iptc metadata manipulation library
 Name:    exiv2
-Version: 0.27.2
-Release: 5%{?dist}
+Version: 0.27.5
+%global internal_ver %{version}
+Release: 2%{?dist}
 
 License: GPLv2+
 URL:     http://www.exiv2.org/
-Source0: https://github.com/Exiv2/%{name}/archive/exiv2-%{version}.tar.gz
+Source0: http://exiv2.org/builds/%{name}-%{version}-Source.tar.gz
 
 ## upstream patches (lookaside cache)
-Patch0:  exiv2-CVE-2019-20421.patch
+
+# Security fixes
 
 ## upstreamable patches
+Patch0: exiv2-no-rpath.patch
 
 BuildRequires: cmake
 BuildRequires: expat-devel
+BuildRequires: gcc-c++
 BuildRequires: gettext
 BuildRequires: pkgconfig
-BuildRequires: pkgconfig(libcurl)
-BuildRequires: pkgconfig(libssh)
 BuildRequires: zlib-devel
 # docs
 BuildRequires: doxygen graphviz libxslt
@@ -64,8 +66,7 @@ BuildArch: noarch
 
 
 %prep
-%autosetup -n %{name}-%{version} -p1
-
+%autosetup -n %{name}-%{version}-Source -p1
 
 %build
 %{cmake} . \
@@ -82,13 +83,10 @@ make install/fast DESTDIR=%{buildroot}
 
 %find_lang exiv2 --with-man
 
-## unpackaged files
-rm -fv %{buildroot}%{_libdir}/libexiv2.la
-#rm -fv %{buildroot}%{_libdir}/pkgconfig/exiv2.lsm
 
 %check
 export PKG_CONFIG_PATH="%{buildroot}%{_libdir}/pkgconfig${PKG_CONFIG_PATH:+:}${PKG_CONFIG_PATH}"
-test "$(pkg-config --modversion exiv2)" = "0.27.2"
+test "$(pkg-config --modversion exiv2)" = "%{internal_ver}"
 test "$(pkg-config --variable=libdir exiv2)" = "%{_libdir}"
 test -x %{buildroot}%{_libdir}/libexiv2.so
 
@@ -105,21 +103,90 @@ test -x %{buildroot}%{_libdir}/libexiv2.so
 
 %files libs
 %{_libdir}/libexiv2.so.27*
-%{_libdir}/libexiv2.so.0.27.2
+%{_libdir}/libexiv2.so.%{internal_ver}
 
 %files devel
 %{_includedir}/exiv2/
 %{_libdir}/libexiv2.so
 %{_libdir}/pkgconfig/exiv2.pc
 %{_libdir}/cmake/exiv2/
+# todo: -static subpkg?  -- rex
 %{_libdir}/libexiv2-xmp.a
 
 %files doc
 %{_pkgdocdir}/
-
+%exclude %{_pkgdocdir}/ChangeLog
 
 
 %changelog
+* Mon Nov 15 2021 Jan Grulich <jgrulich@redhat.com> - 0.27.5-2
+- Remove RPATH
+  Resolves: bz#2018422
+
+* Fri Nov 12 2021 Jan Grulich <jgrulich@redhat.com> - 0.27.5-1
+- Exiv2 0.27.5
+  Resolves: bz#2018422
+
+  Fix stack exhaustion issue in the printIFDStructure function leading to DoS
+  Resolves: bz#2003673
+
+* Tue Aug 24 2021 Jan Grulich <jgrulich@redhat.com> - 0.27.4-5
+- Include missing tests for CVEs
+  Resolves: bz#1993282
+  Resolves: bz#1993245
+
+* Wed Aug 18 2021 Jan Grulich <jgrulich@redhat.com> - 0.27.4-4
+- Fix test for CVE-2021-29470
+  Resolves: bz#1993245
+
+* Wed Aug 18 2021 Jan Grulich <jgrulich@redhat.com> - 0.27.4-3
+- Fix out-of-bounds read in Exiv2::Jp2Image::printStructure
+  Resolves: bz#1993282
+
+- Fix out-of-bounds read in Exiv2::Jp2Image::encodeJp2Header
+  Resolves: bz#1993245
+
+* Thu Aug 05 2021 Jan Grulich <jgrulich@redhat.com> - 0.27.4-2
+- Do not duplicate changelog file
+  Resolves: bz#1989860
+
+* Wed Aug 04 2021 Jan Grulich <jgrulich@redhat.com> - 0.27.4-1
+- 0.27.4
+  Resolves: bz#1989860
+
+* Tue May 25 2021 Jan Grulich <jgrulich@redhat.com> - 0.27.3-6
+- CVE-2021-29623 exiv2: a read of uninitialized memory may lead to information leak
+  Resolves: bz#1964182
+
+- CVE-2021-32617 exiv2: DoS due to quadratic complexity in ProcessUTF8Portion
+  Resolves: bz#1964188
+
+* Thu Apr 29 2021 Jan Grulich <jgrulich@redhat.com> - 0.27.3-5
+- CVE-2021-29473 exiv2: out-of-bounds read in Exiv2::Jp2Image::doWriteMetadata
+  Resolves: bz#1954065
+
+- CVE-2021-29470 exiv2: out-of-bounds read in Exiv2::Jp2Image::encodeJp2Header
+  Resolves: bz#1955014
+
+* Wed Apr 28 2021 Jan Grulich <jgrulich@redhat.com> - 0.27.3-4
+- CVE-2021-29458 exiv2: out-of-bounds read in Exiv2::Internal::CrwMap::encode
+  Resolves: bz#1953758
+
+- CVE-2021-29457 exiv2: heap-based buffer overflow in Exiv2::Jp2Image::doWriteMetadata
+  Resolves: bz#1953772
+
+* Wed Apr 14 2021 Jan Grulich <jgrulich@redhat.com> - 0.27.3-3
+- CVE-2021-3482: Fix heap-based buffer overflow in Jp2Image::readMetadata()
+  Resolves: bz#1947160
+
+* Wed Oct 7 2020 Jan Grulich <jgrulich@redhat.com> - 0.27.3-2
+- Avoid duplicating Changelog file
+  Resolves: bz#1880984
+
+* Wed Oct 7 2020 Jan Grulich <jgrulich@redhat.com> - 0.27.3-1
+- Update to 0.27.3
+  Resolves: bz#1880984
+
 * Wed Mar 04 2020 Jan Grulich <jgrulich@redhat.com> - 0.27.2-5
 - Fix failing test
   Resolves: bz#1800472
