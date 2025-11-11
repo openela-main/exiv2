@@ -1,6 +1,6 @@
 Name:           exiv2
 Version:        0.28.3
-Release:        3%{?dist}.2
+Release:        5%{?dist}
 Summary:        Exif and Iptc metadata manipulation library
 
 # GPL-2.0-or-later: main library
@@ -155,13 +155,13 @@ test -x %{buildroot}%{_libdir}/libexiv2.so
 
 
 %changelog
-* Mon Feb 24 2025 Jan Grulich <jgrulich@redhat.com> - 0.28.3-3.2
+* Mon Feb 24 2025 Jan Grulich <jgrulich@redhat.com> - 0.28.3-5
 - Revert: remove rpath patch
-  Resolves: RHEL-80105
+  Resolves: RHEL-80106
 
-* Mon Feb 24 2025 Jan Grulich <jgrulich@redhat.com> - 0.28.3-3.1
+* Mon Feb 24 2025 Jan Grulich <jgrulich@redhat.com> - 0.28.3-4
 - Fix CVE-2025-26623 exiv2: Use After Free
-  Resolves: RHEL-80105
+  Resolves: RHEL-80106
 
 * Tue Oct 29 2024 Troy Dawson <tdawson@redhat.com> - 0.28.3-3
 - Bump release for October 2024 mass rebuild:
